@@ -1,0 +1,7 @@
+{
+  "name": "vuefire-app",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "vue"
+}
