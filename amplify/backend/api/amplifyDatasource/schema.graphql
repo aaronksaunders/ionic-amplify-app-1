@@ -1,0 +1,13 @@
+type Project @model @auth(rules: [{allow: public}]) {
+  id: ID!
+  title: String
+  description: String
+  Todos: [Todo!] @connection(keyName: "byProject", fields: ["id"])
+}
+
+type Todo @model @auth(rules: [{allow: public}]) @key(name: "byProject", fields: ["projectID"]) {
+  id: ID!
+  name: String!
+  description: String
+  projectID: ID!
+}

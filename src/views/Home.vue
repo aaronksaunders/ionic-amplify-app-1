@@ -2,58 +2,76 @@
   <ion-page>
     <ion-header :translucent="true">
       <ion-toolbar>
-        <ion-title>Inbox</ion-title>
+        <ion-title>USERS COLLECTION</ion-title>
       </ion-toolbar>
     </ion-header>
-    
-    <ion-content :fullscreen="true">
-      <ion-refresher slot="fixed" @ionRefresh="refresh($event)">
-        <ion-refresher-content></ion-refresher-content>
+
+    <ion-content>
+      <div v-if="loading">
+        <ion-loading :is-open="loading === true" />
+      </div>
+      <div v-if="error">
+        <p>error.message</p>
+      </div>
+      <ion-refresher slot="fixed" @ionRefresh="doRefresh($event)">
+        <ion-refresher-content :pulling-icon="chevronDownCircleOutline">
+        </ion-refresher-content>
       </ion-refresher>
-      
-      <ion-header collapse="condense">
-        <ion-toolbar>
-          <ion-title size="large">Inbox</ion-title>
-        </ion-toolbar>
-      </ion-header>
-      
       <ion-list>
-        <MessageListItem v-for="message in messages" :key="message.id" :message="message" />
+        <!-- <UserListItem v-for="user in users" :key="user?.id" :user="user" /> -->
+        <p>{{ projects }}</p>
       </ion-list>
     </ion-content>
   </ion-page>
 </template>
 
 <script lang="ts">
-import { IonContent, IonHeader, IonList, IonPage, IonRefresher, IonRefresherContent, IonTitle, IonToolbar } from '@ionic/vue';
-import MessageListItem from '@/components/MessageListItem.vue';
-import { defineComponent } from 'vue';
-import { getMessages } from '@/data/messages';
+import {
+  IonContent,
+  IonHeader,
+  IonList,
+  IonPage,
+  IonTitle,
+  IonToolbar,
+  IonRefresher,
+  IonRefresherContent,
+  IonLoading
+} from "@ionic/vue";
+import { chevronDownCircleOutline } from "ionicons/icons";
+
+import UserListItem from "@/components/UserListItem.vue";
+import { defineComponent } from "vue";
+import datatore from "../datastore-service";
 
 export default defineComponent({
-  name: 'Home',
-  data() {
+  name: "Home",
+  setup() {
+    const { loading, error, getProjects, projects } = datatore();
+
+    const doRefresh = async (event: CustomEvent) => {
+      await getProjects();
+      (event?.target as any)?.complete();
+    };
+
     return {
-      messages: getMessages()
-    }
-  },
-  methods: {
-    refresh: (ev: CustomEvent) => {
-      setTimeout(() => {
-        ev.detail.complete();
-      }, 3000);
-    }
+      loading,
+      error,
+      projects,
+      doRefresh,
+      chevronDownCircleOutline
+    };
   },
   components: {
     IonContent,
     IonHeader,
     IonList,
     IonPage,
-    IonRefresher,
-    IonRefresherContent,
     IonTitle,
     IonToolbar,
-    MessageListItem
-  },
+    // UserListItem,
+    IonRefresher,
+    IonRefresherContent,
+    IonLoading
+  }
 });
 </script>
